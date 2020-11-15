@@ -34,7 +34,6 @@ enum Shape {DOT, BOX};
 Shape shape;   // circle or square
 float value;   // value between -1.0 and +1.0
 
-int cursorPos = 0;
 boolean showText = true;
 
 
