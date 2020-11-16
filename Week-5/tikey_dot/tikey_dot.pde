@@ -31,7 +31,7 @@
  */
 
 enum Shape {DOT, BOX};
-Shape shape;   // circle or square
+Shape shape;   // shape, circle or square
 float value;   // value between -1.0 and +1.0
 
 boolean showText = true;
