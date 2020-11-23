@@ -2,7 +2,7 @@
  *
  * Copyright 2020 Roland Richter
  *
- * tikey_line is free software: you can redistribute it and/or modify
+ * November_Night is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -16,6 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Text taken from 
+// https://interestingliterature.com/2018/03/a-short-analysis-of-adelaide-crapseys-november-night/
+
 String poet  = "Adelaide Crapsey";
 String title = "November Night";
 String[] poem = { "Listen ...",
@@ -23,13 +26,7 @@ String[] poem = { "Listen ...",
                   "Like steps of passing ghosts,",
                   "The leaves, frost-crisp'd, break from the trees",
                   "And fall."};
-                  
-// Taken from https://interestingliterature.com/2018/03/a-short-analysis-of-adelaide-crapseys-november-night/
 
-/*
- "Yellow Autumn Maple Leaves" by Stanley Zimny is licensed with CC BY-NC 2.0. 
- To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/2.0/ 
-*/
 
 void setup() {
     fullScreen();
@@ -44,7 +41,7 @@ void draw() {
     background(0);
     
     for (int i = 0; i < 24; i++) {
-        drawLeave(random(0,width), random(0,height), 
+        drawLeaf(random(0,width), random(0,height), 
                   random(TWO_PI), 0.1);
     }
     
@@ -54,7 +51,23 @@ void draw() {
     }
 }
 
-void drawLeave(float posX, float posY, float rt, float sc) {
+
+/** Draws a maple leaf at a certain position, rotated and scaled.
+ *
+ * @param posX   the x position of the leaf
+ * @param posY   the y position of the leaf
+ * @param rt     the angle to rotate the leaf, between 0 and TWO_PI
+ * @param sc     the factor to scale the leaf
+ * 
+ * The "Yellow Autumn Maple Leaves" photo served as a reference 
+ * image to create the code below, using the "Art Station" tool,
+ * with minor tweaks added.
+ *
+ * "Yellow Autumn Maple Leaves" by Stanley Zimny is licensed 
+ * with CC BY-NC 2.0.
+ */
+
+void drawLeaf(float posX, float posY, float rt, float sc) {
     fill(-6554);
     strokeWeight(1.0);
     stroke(-6737152);
