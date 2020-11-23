@@ -30,9 +30,9 @@ String[] poem = { "Listen ...",
 
 void setup() {
     fullScreen();
-    frameRate(0.33);
+    frameRate(0.5);
     
-    textSize(36);
+    textSize(28);
     background(0);
 }
 
@@ -40,24 +40,35 @@ void setup() {
 void draw() {
     background(0);
     
-    for (int i = 0; i < 24; i++) {
-        drawLeaf(random(0,width), random(0,height), 
-                  random(TWO_PI), 0.1);
+    // Draws the poem's title in the upper left corner,
+    // the poem itself in the lower left corner,
+    // the poet's name in the lower right corner.
+    fill(192);
+    
+    textAlign(LEFT);
+    text(title, 16, 46);
+    
+    for (int line = 0; line < poem.length; line++) {
+        text(poem[line], 16, height-200+line*46);
     }
     
-    fill(128);
-    for (int line = 0; line < poem.length; line++) {
-        text(poem[line], 16, height - 200 + line*46);
+    textAlign(RIGHT);
+    text("- " + poet, width-16, height-200+4*46);
+    
+    // Draws 24 random leaves on the screen
+    for (int i = 0; i < 24; i++) {
+        drawLeaf(random(0, width), random(0, height), 
+                 random(TWO_PI), random(0.04,0.2));
     }
 }
 
 
 /** Draws a maple leaf at a certain position, rotated and scaled.
  *
- * @param posX   the x position of the leaf
- * @param posY   the y position of the leaf
- * @param rt     the angle to rotate the leaf, between 0 and TWO_PI
- * @param sc     the factor to scale the leaf
+ * @param xPos   the x position of the leaf
+ * @param yPos   the y position of the leaf
+ * @param angle  the angle to rotate the leaf, between 0 and TWO_PI
+ * @param zoom   the factor to scale the leaf
  * 
  * The "Yellow Autumn Maple Leaves" photo served as a reference 
  * image to create the code below, using the "Art Station" tool,
@@ -66,16 +77,16 @@ void draw() {
  * "Yellow Autumn Maple Leaves" by Stanley Zimny is licensed 
  * with CC BY-NC 2.0.
  */
-
-void drawLeaf(float posX, float posY, float rt, float sc) {
-    fill(-6554);
+void drawLeaf(float xPos, float yPos, float angle, float zoom) {
+    fill(#ffe680);
     strokeWeight(1.0);
-    stroke(-6737152);
-    pushMatrix();
+    stroke(#1a1a1a);
     
-    translate(posX, posY);
-    rotate(rt);
-    scale(sc);
+    pushMatrix();
+    translate(xPos, yPos);
+    rotate(angle);
+    scale(zoom);
+    
     beginShape();
     vertex(0.0, 0.0);
     vertex(-76.725006, 25.575012);
