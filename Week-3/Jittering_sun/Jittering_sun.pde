@@ -1,4 +1,4 @@
-/* Jitter.pde
+/* Jittering_sun.pde
  * Copyright 2020 Roland Richter
  */
 

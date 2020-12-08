@@ -1,4 +1,4 @@
-/* Sunrise.pde
+/* Simple_sunrise.pde
  * Copyright 2020 Roland Richter
  */
 
