@@ -33,10 +33,18 @@ void draw() {
     fill(#0077BE);   // "Ocean Boat Blue"
     rect(0, 0.9*height, width, 0.1*height);
     
-    // Draws a simple cloud
+    // Draws a cloud by painting a number
+    // of white circles, with random offsets
     noStroke();
     fill(#F5F5F5); // "White smoke"
-    ellipse(width/2, height/2, 150, 50);
+    
+    randomSeed(42);
+    
+    for (int i = 0; i < 16; i++) {
+       circle(width/2 + random(-80, 80), 
+              height/2 + random(-20, 20), 
+              60); 
+    }
     
     // Displays current frame rate, frame count, etc.
     textSize(12);
