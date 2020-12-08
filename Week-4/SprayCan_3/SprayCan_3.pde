@@ -1,5 +1,6 @@
-// SprayCan.pde
-// Copyright 2020 Roland Richter
+/* SprayCan.pde
+ * Copyright 2020 Roland Richter
+ */
 
 // 540px-David_by_Michelangelo_JBU06.JPG by Jörg Bittner Unna, 
 // CC BY 3.0, https://commons.wikimedia.org/w/index.php?curid=38304749
