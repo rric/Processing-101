@@ -16,187 +16,191 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-boolean paused = false;
-int tick = 0;
+import processing.sound.*;
+import at.mukprojects.console.*;
+
+Console console;
 
 PFont sourceCodefont;
-
-void setup() {
-    size(640, 80);
-    frameRate(2);
-
-    sourceCodefont = loadFont("SourceCodePro-Regular-16.vlw");
-}
-
 final color NeonGreen = #39FF14;
 
+StringDict demoDict = new StringDict();
+SoundFile[] keyboardSounds = new SoundFile[5];
+
+
+void setup() {
+    size(640, 720);
+    frameRate(60);
+
+    // Initialize and start the console 
+    console = new Console(this);
+    console.start();
+
+    sourceCodefont = loadFont("SourceCodePro-Regular-16.vlw");
+    
+    // Pack vintage keyboard by jim-ph used under CC 0
+    // https://freesound.org/people/jim-ph/packs/12363/
+    keyboardSounds[0] = new SoundFile(this, "194795__jim-ph__vintage-keyboard-1.wav");
+    keyboardSounds[1] = new SoundFile(this, "194796__jim-ph__vintage-keyboard-2.wav");
+    keyboardSounds[2] = new SoundFile(this, "194797__jim-ph__vintage-keyboard-3.wav");
+    keyboardSounds[3] = new SoundFile(this, "194798__jim-ph__vintage-keyboard-4.wav");
+    keyboardSounds[4] = new SoundFile(this, "194799__jim-ph__keyboard5.wav");
+    
+    demoDict.set("int",   "integer arithmetic");
+    demoDict.set("float", "floating point arithmetic");
+    demoDict.set("dice",  "dice: array with random numbers");
+}
+
+
+String command = new String();
+String demoArg = new String();
+
+void keyPressed() {
+    // Play a key sound
+    int randomIndex = int(random(0,5));
+    keyboardSounds[randomIndex].play();
+    
+    // If the ENTER key was pressed, analyze the command string that
+    // was typed in, react accordingly, and clear the command string.
+    if (key == ENTER) {
+        if (command.equals("exit")) {
+            exit();
+        }
+
+        if (command.equals("help")) {
+            // Print all possible commands
+            println("help ... show this list of commands");
+            println("exit ... quit the program");
+            
+            String[] theKeys = demoDict.keyArray();
+            String[] theVals = demoDict.valueArray();
+            
+            for (int k = 0; k < theKeys.length; k++) {
+                println("demo", theKeys[k], "...", theVals[k]);
+            }
+        }
+
+        // If the command is "demo <argument>", store the argument
+        // which will then be used within the draw() function;
+        // then, clear the command string.
+        if (command.length() >= 6 && command.startsWith("demo ")) {
+            demoArg = command.substring(5);
+        }
+
+        command = "";
+    }
+
+    // If BACKSPACE was entered, remove the last character from the
+    // comand string, if it is not empty 
+    if (key == BACKSPACE) {
+        if (command.length() > 0) {
+            command = command.substring(0, command.length()-1);
+        }
+    }
+
+    // If any ordinary ASCII character was entered, just append
+    // it to the command string
+    if (key >= 32 && key <= 128) {
+        command = command + key;
+    }
+}
+
+
 void draw() {
-    background(#000000);
+    fill(0);
+    rect(0, 0, width, 80);
 
     textFont(sourceCodefont);
     textSize(16);
     fill(NeonGreen); // Neon green
-    text("> " + (paused ? "paused" : "run " + (tick % 10)), 5, 15);
 
-    if (paused) {
-        return;
-    }
+    char cursor = ((frameCount % 60 < 30) ? ' ' : '_');
+    text("> " + command + cursor, 5, 15);
 
-    if (tick % 10 == 0) {
-        println("--- integer arithmetic ---");
-        int m = 35;
-        int n = 4;
+    if (demoDict.hasKey(demoArg)) {
+        println("---", demoDict.get(demoArg), "---");
 
-        println("m ...", m);
-        println("n ...", n);
-        println("m + n ...", m + n);
-        println("m - n ...", m - n);
-        println("m * n ...", m * n);
-        println("m / n ...", m / n);
-        println("m % n ...", m % n);
-    }
-
-    if (tick % 10 == 0) {
-        int m = 35;
-        int n = 4;
-        println("--- more integer arithmetic ---");
-        println("m ...", m);
-        m += 5;
-        println("m += 5; => m ...", m);
-        m -= 15;
-        println("m -= 15; => m ...", m);
-        m++;
-        println("m++; => m ...", m);
-        ++m;
-        println("++m; => m ...", m);
-
-        println("n ...", n);
-        n *= 3;
-        println("n *= 3; => n ...", n);
-        n /= 6;
-        println("n /= 6; => n ...", n);
-    }
-
-    if (tick % 10 == 2) {
-        println("--- floating point arithmetic ---");
-        float u = 35.01;
-        float v = 4.01;
-
-        println("u ...", u);
-        println("v ...", v);
-        println("u + v ...", u + v);
-        println("u - v ...", u - v);
-        println("u * v ...", u * v);
-        println("u / v ...", u / v);
-    }
-
-    if (tick % 10 == 3) {
-        println("--- boolean expressions ---");
-        int a = 12;
-        int b = 30;
-        int c = 42;
-        println("a, b, c ...", a, b, c);
-
-        println("a < b ? ...", a < b);
-        println("a == b ? ...", a == b);
-        println("a != b ? ...", a != b);
-        println("a > b ? ...", a > b);
-
-        println("a + b <= c ? ...", a <= b);
-        println("a + b == c ? ...", a == b);
-        println("a + b != c ? ...", a != b);
-        println("a + b >= c ? ...", a >= b);
-    }
-
-    if (tick % 10 == 4) {
-        println("--- char ---");
-
-        println("your turn :-)");
-    }
-
-    if (tick % 10 == 5) {
-        println("--- color ---");
-
-        println("neongreen ...", NeonGreen);
-        println("hex(neongreen) ...", hex(NeonGreen));
-        println("binary(neongreen) ...", binary(NeonGreen));
-    }
-
-    if (tick % 10 == 6) {
-        println("--- Strings ---");
-
-        String text = "Cry \"havoc!\" and let slip the dogs of war";
-
-        println("text ...", text);
-        for (int i = 0; i < 8; i++) {
-            println("text.charAt(", i, ") ...", text.charAt(i));
-        }
-        println("etc.");
-    }
-
-    if (tick % 10 == 7) {
-        println("--- for loops ---");
-
-        println("for (int i = 0; i < 7; i++) ...");
-        for (int i = 0; i < 7; i++) {
-            println("    i ...", i);
+        if (demoArg.equals("int")) {
+            demo_int();
         }
 
-        println("for (int j = 0; j <= 6; j = j + 1) ...");
-        for (int j = 0; j <= 6; j = j + 1) {
-            println("    j ...", j);
+        if (demoArg.equals("float")) {
+            demo_float();
         }
 
-        println("for (int k = 42; k >= 0; k = k - 7) ...");
-        for (int k = 42; k >= 0; k = k - 7) {
-            println("    k ...", k);
+        if (demoArg.equals("dice")) {
+            demo_dice();
         }
     }
 
-    if (tick % 10 == 8) {
-        println("--- array with random numbers ---");
+    // Print the console to the system out.
+    console.print();
 
-        int[] dice = new int[10];
+    // Draw the console to the screen. 
+    // (x, y, width, height, preferredTextSize, minTextSize, linespace, padding, strokeColor, backgroundColor, textColor)
+    console.draw(0, 80, width, height, 16, 16, 4, 4, color(255), color(0), NeonGreen);
 
-        randomSeed(42);
-
-        for (int k = 0; k < 10; k++) {
-            dice[k] = int(random(1, 7));
-        }
-
-        println("dice ...");
-        printArray(dice);
-
-        dice = sort(dice);
-        println("dice = sort(dice); => dice ...");
-        printArray(dice);
-    }
-
-    if (tick % 10 == 9) {
-        println("--- ASCII patterns ---");
-
-        for (int row = 0; row < 13; row++) {
-            for (int col = 0; col < row; col++) {
-                print("*");
-            }
-            println();
-        }
-    }
-
-    tick++;
+    demoArg = "";    
 }
 
 
-void keyPressed() {
-    if (key == ESC || key == 'q' || key == 'Q') {
-        exit();
-    } 
-        
-    if (key == 'p' || key == 'P') {
-        paused = true;
+void demo_int() {
+    int m = 35;
+    int n = 4;
+
+    println("m ...", m);
+    println("n ...", n);
+    println("m + n ...", m + n);
+    println("m - n ...", m - n);
+    println("m * n ...", m * n);
+    println("m / n ...", m / n);
+    println("m % n ...", m % n);
+
+    println("m ...", m);
+    m += 5;
+    println("m += 5; => m ...", m);
+    m -= 15;
+    println("m -= 15; => m ...", m);
+    m++;
+    println("m++; => m ...", m);
+    ++m;
+    println("++m; => m ...", m);
+
+    println("n ...", n);
+    n *= 3;
+    println("n *= 3; => n ...", n);
+    n /= 6;
+    println("n /= 6; => n ...", n);
+}
+
+
+void demo_float() {
+    float u = 35.01;
+    float v = 4.01;
+
+    println("u ...", u);
+    println("v ...", v);
+    println("u + v ...", u + v);
+    println("u - v ...", u - v);
+    println("u * v ...", u * v);
+    println("u / v ...", u / v);
+}
+
+
+void demo_dice() {
+    int[] dice = new int[10];
+
+    // randomSeed(42);
+    // println("randomSeed(42);");
+
+    for (int k = 0; k < 10; k++) {
+        dice[k] = int(random(1, 7));
     }
-    
-    if (key == 'r' || key == 'R') {
-        paused = false;
-    }    
+
+    println("dice ...");
+    printArray(dice);
+
+    dice = sort(dice);
+    println("dice = sort(dice); => dice ...");
+    printArray(dice);
 }
