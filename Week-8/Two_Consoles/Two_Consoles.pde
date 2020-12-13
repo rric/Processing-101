@@ -1,4 +1,4 @@
-/* The_Console.pde
+/* Two_Consoles.pde
  *
  * Copyright 2020 Roland Richter
  *
@@ -16,14 +16,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import at.mukprojects.console.*;
+
+Console console;
 boolean paused = false;
 int tick = 0;
 
 PFont sourceCodefont;
 
 void setup() {
-    size(640, 80);
+    size(640, 480);
     frameRate(2);
+
+    // Initialize and start the console 
+    console = new Console(this);
+    console.start();
 
     sourceCodefont = loadFont("SourceCodePro-Regular-16.vlw");
 }
@@ -31,8 +38,9 @@ void setup() {
 final color NeonGreen = #39FF14;
 
 void draw() {
-    background(#000000);
-
+    fill(0);
+    rect(0, 0, width, 80);
+    
     textFont(sourceCodefont);
     textSize(16);
     fill(NeonGreen); // Neon green
@@ -183,6 +191,13 @@ void draw() {
         }
     }
 
+    // Print the console to the system out.
+    console.print();
+
+    // Draw the console to the screen. 
+    // (x, y, width, height, preferredTextSize, minTextSize, linespace, padding, strokeColor, backgroundColor, textColor)
+    console.draw(0, 80, width, height, 16, 16, 4, 4, color(255), color(0), NeonGreen);
+    
     tick++;
 }
 
