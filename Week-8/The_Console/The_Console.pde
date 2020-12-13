@@ -21,15 +21,14 @@ import at.mukprojects.console.*;
 
 Console console;
 
-PFont sourceCodefont;
 final color NeonGreen = #39FF14;
-
-StringDict demoDict = new StringDict();
+PFont sourceCodefont;
 SoundFile[] keyboardSounds = new SoundFile[5];
 
+StringDict demoDict = new StringDict();
 
 void setup() {
-    size(640, 720);
+    fullScreen();
     frameRate(60);
 
     // Initialize and start the console 
@@ -37,7 +36,7 @@ void setup() {
     console.start();
 
     sourceCodefont = loadFont("SourceCodePro-Regular-16.vlw");
-    
+
     // Pack vintage keyboard by jim-ph used under CC 0
     // https://freesound.org/people/jim-ph/packs/12363/
     keyboardSounds[0] = new SoundFile(this, "194795__jim-ph__vintage-keyboard-1.wav");
@@ -45,10 +44,13 @@ void setup() {
     keyboardSounds[2] = new SoundFile(this, "194797__jim-ph__vintage-keyboard-3.wav");
     keyboardSounds[3] = new SoundFile(this, "194798__jim-ph__vintage-keyboard-4.wav");
     keyboardSounds[4] = new SoundFile(this, "194799__jim-ph__keyboard5.wav");
-    
-    demoDict.set("int",   "integer arithmetic");
+
+    // Create a list of available demos
+    demoDict.set("int", "integer arithmetic");
     demoDict.set("float", "floating point arithmetic");
-    demoDict.set("dice",  "dice: array with random numbers");
+    demoDict.set("for", "simple for-loops");
+    demoDict.set("dice", "dice: array with random numbers");
+    demoDict.set("string", "working with Strings");
 }
 
 
@@ -56,10 +58,10 @@ String command = new String();
 String demoArg = new String();
 
 void keyPressed() {
-    // Play a key sound
-    int randomIndex = int(random(0,5));
+    // Play one of five keyboard sounds
+    int randomIndex = int(random(0, 5));
     keyboardSounds[randomIndex].play();
-    
+
     // If the ENTER key was pressed, analyze the command string that
     // was typed in, react accordingly, and clear the command string.
     if (key == ENTER) {
@@ -71,10 +73,10 @@ void keyPressed() {
             // Print all possible commands
             println("help ... show this list of commands");
             println("exit ... quit the program");
-            
+
             String[] theKeys = demoDict.keyArray();
             String[] theVals = demoDict.valueArray();
-            
+
             for (int k = 0; k < theKeys.length; k++) {
                 println("demo", theKeys[k], "...", theVals[k]);
             }
@@ -112,7 +114,7 @@ void draw() {
 
     textFont(sourceCodefont);
     textSize(16);
-    fill(NeonGreen); // Neon green
+    fill(NeonGreen);
 
     char cursor = ((frameCount % 60 < 30) ? ' ' : '_');
     text("> " + command + cursor, 5, 15);
@@ -128,9 +130,17 @@ void draw() {
             demo_float();
         }
 
+        if (demoArg.equals("for")) {
+            demo_for();
+        }        
+
         if (demoArg.equals("dice")) {
             demo_dice();
         }
+        
+        if (demoArg.equals("string")) {
+            demo_string();
+        }        
     }
 
     // Print the console to the system out.
@@ -140,7 +150,7 @@ void draw() {
     // (x, y, width, height, preferredTextSize, minTextSize, linespace, padding, strokeColor, backgroundColor, textColor)
     console.draw(0, 80, width, height, 16, 16, 4, 4, color(255), color(0), NeonGreen);
 
-    demoArg = "";    
+    demoArg = "";
 }
 
 
@@ -177,13 +187,34 @@ void demo_int() {
 void demo_float() {
     float u = 35.01;
     float v = 4.01;
+    float w = -2;
 
     println("u ...", u);
     println("v ...", v);
+    println("w ...", w);
     println("u + v ...", u + v);
     println("u - v ...", u - v);
     println("u * v ...", u * v);
     println("u / v ...", u / v);
+    println("w * (u - (v + 32)) ...", 
+        w * (u - (v + 32)));
+}
+
+void demo_for() {
+    println("for (int i = 0; i < 7; i++) ...");
+    for (int i = 0; i < 7; i++) {
+        println("    i ...", i);
+    }
+
+    println("for (int j = 0; j <= 6; j = j + 1) ...");
+    for (int j = 0; j <= 6; j = j + 1) {
+        println("    j ...", j);
+    }
+
+    println("for (int k = 42; k >= 0; k = k - 7) ...");
+    for (int k = 42; k >= 0; k = k - 7) {
+        println("    k ...", k);
+    }
 }
 
 
@@ -203,4 +234,26 @@ void demo_dice() {
     dice = sort(dice);
     println("dice = sort(dice); => dice ...");
     printArray(dice);
+}
+
+
+void demo_string() {
+    String text = "Cry \"havoc!\" and let slip the dogs of war";
+
+    println("text ...", text);
+    for (int i = 0; i < 8; i++) {
+        println("text.charAt(", i, ") ...", text.charAt(i));
+    }
+    println("etc.");
+
+    String lower = "hello";
+    String upper = new String("HELLO");
+
+    println("lower ...", lower, ", upper ...", upper);
+    println("lower.equals(upper)? ...", lower.equals(upper));
+    
+    upper = upper.toLowerCase();
+    print("upper.toLowerCase() =>");
+    println("lower ...", lower, ", upper ...", upper);
+    println("lower.equals(upper)? ...", lower.equals(upper));
 }
