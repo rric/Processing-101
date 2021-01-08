@@ -20,7 +20,6 @@ import processing.video.*;
 
 PImage source;
 boolean isCamera;
-
 PImage display;
 
 void setup() {
@@ -51,16 +50,15 @@ void setup() {
     if (isCamera) {
         ((Capture)source).start();
     }
-    
+
     display = createImage(source.width, source.height, source.format);
 }
 
 // Returns
-float getMouseDist() {
-    float maxDist = dist(width/2, height/2, 0, 0);
-    float mouseDist = dist(width/2, height/2, mouseX, mouseY);
+float getMouseDist(int x, int y) {
+    float mouseDist = dist(x, y, mouseX, mouseY);
 
-    return map(mouseDist, 0, maxDist, 0, 100.);
+    return mouseDist;
 }
 
 
@@ -97,9 +95,9 @@ void draw() {
     source.loadPixels();
 
     // --- Variant 1: very slow, ~ 3 fps and decreasing! ---
-    //for (int row = 0; row < video.height; row++) {
-    //    for (int col = 0; col < video.width; col++) {
-    //        color c = video.get(col, row);
+    //for (int row = 0; row < source.height; row++) {
+    //    for (int col = 0; col < source.width; col++) {
+    //        color c = source.get(col, row);
     //        float h = wrap360(hue(c) + getMouseDegrees());
     //        float s = saturation(c);
     //        float b = constrain(brightness(c) - getMouseDist(), 0, 100);
@@ -110,17 +108,22 @@ void draw() {
     // --- end of variant 1 ---
 
     // --- Variant 2: much faster, stable > 20 fps ---
-    int refLoc = width/2 +  source.width * (height/2 + 20);
+    int refLoc = width/2 + source.width * (height/2 + 20);
 
-    for (int loc = 0; loc < source.width * source.height; loc++) {
-        color c = source.pixels[loc];
-        float h = wrap360(hue(c) + getMouseDegrees());
-        float s = saturation(c);
-        float b = constrain(brightness(c) - getMouseDist(), 0, 100);
-        display.pixels[loc] = color(h, s, b);
+    int loc = 0;
 
-        if (loc == refLoc) {
-            println(hue(c), s, brightness(c), " => ", h, s, b);
+    for (int row = 0; row < source.height; row++) {
+        for (int col = 0; col < source.width; col++) {
+            color c = source.pixels[loc];
+            float h = wrap360(hue(c) + getMouseDegrees());
+            float s = saturation(c);
+            float b = constrain(brightness(c) - 0.5*getMouseDist(col, row), 0, 100);
+            display.pixels[loc] = color(h, s, b);
+
+            if (loc == refLoc) {
+                println(hue(c), s, brightness(c), " => ", h, s, b);
+            }
+            loc++;
         }
     }
 
@@ -128,14 +131,9 @@ void draw() {
     image(display, 0, 0);
     // --- end of variant 2 ---
 
-    float mouseDist = getMouseDist();
-    float mouseDegrees = getMouseDegrees();
-
     textSize(12);
     stroke(0, 0, 99);
     noFill();
-    text(mouseDist + " pxls", width-300, height-15);
-    text(mouseDegrees + " deg", width-200, height-15);
     text(frameRate + " fps", width-100, height-15);
     circle(width/2, height/2 + 20, 5);
 }
