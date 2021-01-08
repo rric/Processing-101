@@ -18,34 +18,41 @@
 
 import processing.video.*;
 
-Capture video;
+PImage source;
+boolean isCamera;
+
+PImage display;
 
 void setup() {
     size(640, 480);
-    frameRate(30);
 
     // Copied from GettingStartedCapture example
     String[] cameras = Capture.list();
 
     if (cameras == null) {
-        println("Failed to retrieve list of available cameras, will try default ...");
-        video = new Capture(this, 640, 480);
+        println("Failed to retrieve list of available cameras");
+        source = loadImage("640px-FuBK_testcard_vectorized.png");
+        isCamera = false;
     } else if (cameras.length == 0) {
         println("There are no cameras available for capture.");
-        exit();
+        source = loadImage("640px-FuBK_testcard_vectorized.png");
+        isCamera = false;
     } else {
         println("Available cameras:");
         printArray(cameras);
 
         // The camera can be initialized directly using an element
         // from the array returned by list():
-        video = new Capture(this, cameras[0]);
-        // Or, the settings can be defined based on the text in the list
-        //cam = new Capture(this, 640, 480, "Built-in iSight", 30);
+        source = new Capture(this, cameras[0]);
+        isCamera = true;
     }
 
     // Start capturing the images from the camera
-    video.start();
+    if (isCamera) {
+        ((Capture)source).start();
+    }
+    
+    display = createImage(source.width, source.height, source.format);
 }
 
 // Returns
@@ -79,49 +86,49 @@ float wrap360(float value) {
 void draw() {
     colorMode(HSB, 360, 100, 100);
 
-    if (video.available()) {
-        video.read();
-        video.loadPixels();
-
-        background(0);
-
-        // --- Variant 1: very slow, ~ 3 fps and decreasing! ---
-        //for (int row = 0; row < video.height; row++) {
-        //    for (int col = 0; col < video.width; col++) {
-        //        color c = video.get(col, row);
-        //        float h = wrap360(hue(c) + getMouseDegrees());
-        //        float s = saturation(c);
-        //        float b = constrain(brightness(c) - getMouseDist(), 0, 100);
-        //        stroke(h, s, b);
-        //        point(col, row);
-        //    }
-        //}
-        // --- end of variant 1 ---
-
-        // --- Variant 2: much faster, stable > 20 fps ---
-        
-        int refLoc = width/2 +  video.width * (height/2 + 20);
-        
-        for (int loc = 0; loc < video.width * video.height; loc++) {
-            color c = video.pixels[loc];
-            float h = wrap360(hue(c) + getMouseDegrees());
-            float s = saturation(c);
-            float b = constrain(brightness(c) - getMouseDist(), 0, 100);
-            video.pixels[loc] = color(h, s, b);
-            
-            if (loc == refLoc) {
-                println(hue(c), s, brightness(c), " => ", h, s, b);
-            }
+    if (isCamera) {
+        if (((Capture)source).available()) {
+            ((Capture)source).read();
+        } else {
+            return;
         }
-
-        video.updatePixels();
-        image(video, 0, 0, width, height);
-        // --- end of variant 2 ---
     }
 
-    // image(cam, 0, 0, width, height);
+    source.loadPixels();
 
-    float mouseDist= getMouseDist();
+    // --- Variant 1: very slow, ~ 3 fps and decreasing! ---
+    //for (int row = 0; row < video.height; row++) {
+    //    for (int col = 0; col < video.width; col++) {
+    //        color c = video.get(col, row);
+    //        float h = wrap360(hue(c) + getMouseDegrees());
+    //        float s = saturation(c);
+    //        float b = constrain(brightness(c) - getMouseDist(), 0, 100);
+    //        stroke(h, s, b);
+    //        point(col, row);
+    //    }
+    //}
+    // --- end of variant 1 ---
+
+    // --- Variant 2: much faster, stable > 20 fps ---
+    int refLoc = width/2 +  source.width * (height/2 + 20);
+
+    for (int loc = 0; loc < source.width * source.height; loc++) {
+        color c = source.pixels[loc];
+        float h = wrap360(hue(c) + getMouseDegrees());
+        float s = saturation(c);
+        float b = constrain(brightness(c) - getMouseDist(), 0, 100);
+        display.pixels[loc] = color(h, s, b);
+
+        if (loc == refLoc) {
+            println(hue(c), s, brightness(c), " => ", h, s, b);
+        }
+    }
+
+    display.updatePixels();
+    image(display, 0, 0);
+    // --- end of variant 2 ---
+
+    float mouseDist = getMouseDist();
     float mouseDegrees = getMouseDegrees();
 
     textSize(12);
