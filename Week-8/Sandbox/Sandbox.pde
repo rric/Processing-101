@@ -4,7 +4,9 @@ size(320, 240);
 print(width, "x", height);
 print("...is a square?", 
         width == height);
-
+        
+println();
+println();
 // --- println, printArray ---
 int[] primes = {2, 3, 5, 7};
 println("first", primes.length, "primes:");
@@ -34,4 +36,21 @@ for (int i = 0; i < 7; i++) {
 println();
 for (int j = 0; j <= 6; j = j + 1) {
     print(j, "->");
+}
+
+println();
+for (int row = 0; row < 8; row++) {
+    for (int col = 0; col < row; col++) {
+        print("*");
+    }
+    println();
+}
+
+println();
+for (int row = 0; row < 8; row++) {
+    print("row = ", row, ": col = ");
+    for (int col = 0; col < row; col++) {
+        print(col, " ");
+    }
+    println();
 }
