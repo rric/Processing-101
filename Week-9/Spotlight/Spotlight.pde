@@ -112,7 +112,7 @@ void draw() {
 
     textSize(12);
     textAlign(RIGHT);
-    stroke(0, 0, 99);
+    fill(0, 0, 99);
 
     text(degrees + " deg", 80, height-15);
     text(frameRate + " fps", width-10, height-15);

@@ -1,4 +1,4 @@
-/* SpotlightLive.pde
+/* SpotlightShapes.pde
  *
  * Copyright 2021 Roland Richter
  *
@@ -102,6 +102,7 @@ float wrap360(float value) {
 
 void draw() {
     colorMode(HSB, 360, 100, 100);
+    rectMode(CENTER);
 
     if (isCamera) {
         if (((Capture)source).available()) {
@@ -113,34 +114,48 @@ void draw() {
 
     source.loadPixels();
 
-    // --- Variant 1: very slow, ~ 3 fps and decreasing! ---
-    //for (int row = 0; row < source.height; row++) {
-    //    for (int col = 0; col < source.width; col++) {
-    //        color c = source.get(col, row);
-    //        color newc = transformPixel(col, row, c);
-    //        stroke(newc);
-    //        point(col, row);
-    //    }
-    //}
-    // --- end of variant 1 ---
-
-    // --- Variant 2: much faster, stable > 20 fps ---
-    int loc = 0;
-
-    for (int row = 0; row < source.height; row++) {
-        for (int col = 0; col < source.width; col++) {
-
-            color c = source.pixels[loc];
-
-            display.pixels[loc] = transformPixel(col, row, c);
-
-            loc++;
+    if (mousePressed && (mouseButton == LEFT)) {
+        // Variant 3: fast again, because only every 20th
+        // row and column is processed
+        background(0);
+        
+        for (int row = 0; row < source.height; row += 20) {
+            for (int col = 0; col < source.width; col += 20) {
+                color c = source.get(col, row);
+                stroke(c);
+                fill(c);
+                
+                float h = wrap360(hue(c) + degrees);
+                if (h <= 60 || h > 300) { 
+                    rect(col, row, 12, 8);
+                } else if (h > 60 && h <= 180) {
+                    circle(col, row, 10);
+                } else {
+                    triangle(col, row+6, col+6, row-6, col-6, row-6);
+                }
+            }
         }
-    }
+        // --- end of variant 3 ---
+    } else {
 
-    display.updatePixels();
-    image(display, 0, 0);
-    // --- end of variant 2 ---
+        // --- Variant 2: much faster, stable > 20 fps ---
+        int loc = 0;
+
+        for (int row = 0; row < source.height; row++) {
+            for (int col = 0; col < source.width; col++) {
+
+                color c = source.pixels[loc];
+
+                display.pixels[loc] = transformPixel(col, row, c);
+
+                loc++;
+            }
+        }
+
+        display.updatePixels();
+        image(display, 0, 0);
+        // --- end of variant 2 ---
+    }
 
     textSize(12);
     textAlign(RIGHT);
