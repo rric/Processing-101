@@ -1,4 +1,4 @@
-/* ColorShift.pde
+/* SpotlightLive.pde
  *
  * Copyright 2021 Roland Richter
  *
@@ -25,11 +25,14 @@ PImage display;
 void setup() {
     size(640, 480);
 
-    // Copied from GettingStartedCapture example
+    // Code to initialize camera was copied from the
+    // GettingStartedCapture example
+    // "FuBK-Testbild.png" by Rotkaeppchen68 is licensed with CC BY-SA 3.0,
+    // https://commons.wikimedia.org/w/index.php?curid=42157266
     String[] cameras = Capture.list();
 
     if (cameras == null) {
-        println("Failed to retrieve list of available cameras");
+        println("Failed to retrieve list of available cameras.");
         source = loadImage("640px-FuBK_testcard_vectorized.png");
         isCamera = false;
     } else if (cameras.length == 0) {
@@ -54,18 +57,34 @@ void setup() {
     display = createImage(source.width, source.height, source.format);
 }
 
-// Returns
-float getMouseDist(int x, int y) {
-    float mouseDist = dist(x, y, mouseX, mouseY);
+float degrees = 0.0;
 
-    return mouseDist;
+void mouseWheel(MouseEvent event) {
+    float count = event.getCount();
+    degrees = wrap180(degrees - 6 * count);
 }
 
 
-// Returns
-float getMouseDegrees() {
-    float deg = degrees(atan2(height/2-mouseY, mouseX-width/2));
-    return deg;
+color transformPixel(int x, int y, color c) {
+    float mouseDist = dist(x, y, mouseX, mouseY);
+
+    float h = wrap360(hue(c) + degrees);
+    float s = saturation(c);
+    float b = constrain(brightness(c) - 0.5 * mouseDist, 0, 100);
+
+    return color(h, s, b);
+}
+
+
+float wrap180(float value) {
+    if (value < -180.) {
+        return value + 360.;
+    }
+    if (value > 180.) {
+        return value - 360.;
+    }
+
+    return value;
 }
 
 
@@ -98,31 +117,23 @@ void draw() {
     //for (int row = 0; row < source.height; row++) {
     //    for (int col = 0; col < source.width; col++) {
     //        color c = source.get(col, row);
-    //        float h = wrap360(hue(c) + getMouseDegrees());
-    //        float s = saturation(c);
-    //        float b = constrain(brightness(c) - getMouseDist(), 0, 100);
-    //        stroke(h, s, b);
+    //        color newc = transformPixel(col, row, c);
+    //        stroke(newc);
     //        point(col, row);
     //    }
     //}
     // --- end of variant 1 ---
 
     // --- Variant 2: much faster, stable > 20 fps ---
-    int refLoc = width/2 + source.width * (height/2 + 20);
-
     int loc = 0;
 
     for (int row = 0; row < source.height; row++) {
         for (int col = 0; col < source.width; col++) {
-            color c = source.pixels[loc];
-            float h = wrap360(hue(c) + getMouseDegrees());
-            float s = saturation(c);
-            float b = constrain(brightness(c) - 0.5*getMouseDist(col, row), 0, 100);
-            display.pixels[loc] = color(h, s, b);
 
-            if (loc == refLoc) {
-                println(hue(c), s, brightness(c), " => ", h, s, b);
-            }
+            color c = source.pixels[loc];
+
+            display.pixels[loc] = transformPixel(col, row, c);
+
             loc++;
         }
     }
@@ -132,8 +143,9 @@ void draw() {
     // --- end of variant 2 ---
 
     textSize(12);
+    textAlign(RIGHT);
     stroke(0, 0, 99);
-    noFill();
-    text(frameRate + " fps", width-100, height-15);
-    circle(width/2, height/2 + 20, 5);
+
+    text(degrees + " deg", 80, height-15);
+    text(frameRate + " fps", width-10, height-15);
 }
