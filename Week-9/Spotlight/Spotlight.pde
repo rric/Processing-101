@@ -34,7 +34,7 @@ float degrees = 0.0;
 
 void mouseWheel(MouseEvent event) {
     float count = event.getCount();
-    degrees = wrap180(degrees - 6 * count);
+    degrees = wrap360(degrees - 6 * count);
 }
 
 
@@ -49,23 +49,11 @@ color transformPixel(int x, int y, color c) {
 }
 
 
-float wrap180(float value) {
-    if (value < -180.) {
-        return value + 360.;
-    }
-    if (value > 180.) {
-        return value - 360.;
-    }
-
-    return value;
-}
-
-
 float wrap360(float value) {
     if (value < 0.) {
         return value + 360.;
     }
-    if (value > 360.) {
+    if (value >= 360.) {
         return value - 360.;
     }
 
@@ -81,11 +69,8 @@ void draw() {
     // --- Variant 1: very slow, ~ 3 fps and decreasing! ---
     //for (int row = 0; row < source.height; row++) {
     //    for (int col = 0; col < source.width; col++) {
-
     //        color c = source.get(col, row);
-
     //        color newc = transformPixel(col, row, c);
-
     //        stroke(newc);
     //        point(col, row);
     //    }
@@ -93,16 +78,16 @@ void draw() {
     // --- end of variant 1 ---
 
     // --- Variant 2: much faster, stable > 20 fps ---
-    int loc = 0;
+    int idx = 0;
 
     for (int row = 0; row < source.height; row++) {
         for (int col = 0; col < source.width; col++) {
 
-            color c = source.pixels[loc];
+            color c = source.pixels[idx];
 
-            display.pixels[loc] = transformPixel(col, row, c);
+            display.pixels[idx] = transformPixel(col, row, c);
 
-            loc++;
+            idx++;
         }
     }
 
