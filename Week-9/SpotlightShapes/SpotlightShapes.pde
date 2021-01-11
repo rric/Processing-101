@@ -100,19 +100,17 @@ void draw() {
         }
     }
 
-    source.loadPixels();
-
     if (mousePressed && (mouseButton == LEFT)) {
         // Variant 3: fast again, because only every 20th
         // row and column is processed
         background(0);
-        
+
         for (int row = 0; row < source.height; row += 20) {
             for (int col = 0; col < source.width; col += 20) {
                 color c = source.get(col, row);
                 stroke(c);
                 fill(c);
-                
+
                 float h = wrap360(hue(c) + degrees);
                 if (h <= 60 || h > 300) { 
                     rect(col, row, 12, 8);
@@ -125,18 +123,19 @@ void draw() {
         }
         // --- end of variant 3 ---
     } else {
-
         // --- Variant 2: much faster, stable > 20 fps ---
-    int idx = 0;
+        source.loadPixels();
+
+        int idx = 0;
 
         for (int row = 0; row < source.height; row++) {
             for (int col = 0; col < source.width; col++) {
 
-            color c = source.pixels[idx];
+                color c = source.pixels[idx];
 
-            display.pixels[idx] = transformPixel(col, row, c);
+                display.pixels[idx] = transformPixel(col, row, c);
 
-            idx++;
+                idx++;
             }
         }
 

@@ -99,8 +99,6 @@ void draw() {
         }
     }
 
-    source.loadPixels();
-
     // --- Variant 1: very slow, ~ 3 fps and decreasing! ---
     //for (int row = 0; row < source.height; row++) {
     //    for (int col = 0; col < source.width; col++) {
@@ -113,6 +111,7 @@ void draw() {
     // --- end of variant 1 ---
 
     // --- Variant 2: much faster, stable > 20 fps ---
+    source.loadPixels();
     int idx = 0;
 
     for (int row = 0; row < source.height; row++) {
